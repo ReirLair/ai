@@ -87,6 +87,7 @@ app.get('/gemini', createRoute('gemini'));
 app.get('/claude', createRoute('claude'));
 app.get('/chatgpt', createRoute('chatgpt'));
 app.get('/mistral', createRoute('mistral'));
+app.get('/gpt41', createRoute('chatgpt41mini'));
 
 // Start server
 app.listen(PORT, () => {
