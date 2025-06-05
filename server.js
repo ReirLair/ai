@@ -68,19 +68,30 @@ function createRoute(model) {
     const { id, message } = req.query;
 
     if (!id || !message) {
-      return res.status(400).send('Missing id or message.');
+      return res.status(400).json({ error: 'Missing id or message' });
+    }
+
+    if (!isValidSessionId(id)) {
+      return res.status(400).json({ error: 'Invalid session ID format' });
     }
 
     try {
       const reply = await talkToClaila(model, message, id);
-      res.send(reply);
+
+      try {
+        const parsed = JSON.parse(reply);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(parsed));
+      } catch {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ response: reply }));
+      }
     } catch (err) {
       console.error(err);
-      res.status(500).send('Error talking to Claila');
+      res.status(500).json({ error: 'Error talking to Claila' });
     }
   };
 }
-
 // Define routes for each model
 app.get('/grok', createRoute('grok'));
 app.get('/gemini', createRoute('gemini'));
